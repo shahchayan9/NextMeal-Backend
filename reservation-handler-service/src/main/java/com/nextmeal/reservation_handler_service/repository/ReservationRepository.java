@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -24,4 +25,14 @@ public interface ReservationRepository extends JpaRepository<Reservation, String
             @Param("numberOfPeople") Integer numberOfPeople
     );
 
+    @Query("SELECT SUM(r.numberOfPeople) FROM Reservation r " +
+            "WHERE r.restaurantId = :restaurantId " +
+            "AND r.slot = :slot " +
+            "AND r.status = 'CONFIRMED'")
+    Optional<Integer> findTotalNumberOfPeopleByRestaurantAndSlot(
+            @Param("restaurantId") String restaurantId,
+            @Param("slot") LocalDateTime slot
+    );
+
+    List<Reservation> findByUserId(String userId);
 }

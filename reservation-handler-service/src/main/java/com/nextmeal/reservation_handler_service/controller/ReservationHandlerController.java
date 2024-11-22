@@ -10,13 +10,11 @@ import com.nextmeal.reservation_handler_service.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -41,41 +39,47 @@ public class ReservationHandlerController {
         Optional<User> userOptional = userService.getUserById(request.getUserId());
         Optional<Restaurant> restaurantOptional = restaurantService.getRestaurantById(request.getRestaurantId());
 
-        User user = null;
-        Restaurant restaurant = null;
         String response = "User/Restaurant not found";
 
         if (userOptional.isPresent() && restaurantOptional.isPresent()) {
-            user = userOptional.get();
-            restaurant = restaurantOptional.get();
+            User user = userOptional.get();
+            Restaurant restaurant = restaurantOptional.get();
+            LocalDateTime slot = LocalDateTime.ofInstant(request.getSlot().toInstant(), ZoneId.systemDefault());
 
-            Reservation reservation = new Reservation(user.getUserId(), restaurant.getBusinessId(), LocalDateTime.ofInstant(request.getSlot().toInstant(),
-                    ZoneId.systemDefault()), request.getNumOfPeople(), "CONFIRMED");
-            reservationService.saveReservation(reservation);
+            if (reservationService.checkReservationAvailability(restaurant.getBusinessId(), slot, request.getNumOfPeople())) {
+                Reservation reservation = new Reservation(user.getUserId(), restaurant.getBusinessId(), slot, request.getNumOfPeople(), "CONFIRMED");
+                reservationService.saveReservation(reservation);
 
-            response = "Hello " + user.getName() + ", your reservation for " +
-                    request.getNumOfPeople() + " at " +
-                    restaurant.getName() + " on " + request.getSlot().toString() +
-                    " has been successfully confirmed. Thank you!";
+                response = "Hello " + user.getName() + ", your reservation for " +
+                        request.getNumOfPeople() + " at " +
+                        restaurant.getName() + " on " + request.getSlot().toString() +
+                        " has been successfully confirmed. Thank you!";
+            } else {
+                Reservation reservation = new Reservation(user.getUserId(), restaurant.getBusinessId(), slot, request.getNumOfPeople(), "REJECTED");
+                reservationService.saveReservation(reservation);
+
+                response = "Hello " + user.getName() + ", your reservation for " +
+                        request.getNumOfPeople() + " at " +
+                        restaurant.getName() + " on " + request.getSlot().toString() +
+                        " has been unfortunately rejected due to constraints. Please try a different slot!";
+            }
         }
 
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/cancel")
-    private ResponseEntity<String> cancelReservation(@RequestBody ReservationRequest request) {
+    public ResponseEntity<String> cancelReservation(@RequestBody ReservationRequest request) {
         logger.info("Received cancellation request: {}", request);
 
         Optional<User> userOptional = userService.getUserById(request.getUserId());
         Optional<Restaurant> restaurantOptional = restaurantService.getRestaurantById(request.getRestaurantId());
 
-        User user = null;
-        Restaurant restaurant = null;
         String response = "User/Restaurant not found";
 
         if (userOptional.isPresent() && restaurantOptional.isPresent()) {
-            user = userOptional.get();
-            restaurant = restaurantOptional.get();
+            User user = userOptional.get();
+            Restaurant restaurant = restaurantOptional.get();
 
             Optional<String> reservationIdOptional = reservationService.findReservationByDetails(user.getUserId(), restaurant.getBusinessId(),
                     LocalDateTime.ofInstant(request.getSlot().toInstant(), ZoneId.systemDefault()), request.getNumOfPeople());
@@ -95,5 +99,20 @@ public class ReservationHandlerController {
         }
 
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/view/{userId}")
+    public ResponseEntity<List<Reservation>> getReservationsForUser(@PathVariable String userId) {
+        logger.info("Received view reservations request for: {}", userId);
+
+        List<Reservation> reservationsByUser = null;
+        Optional<User> userOptional = userService.getUserById(userId);
+
+        if (userOptional.isPresent()) {
+            reservationsByUser = reservationService.findReservationsForUser(userId);
+            logger.info("Found {} reservations", reservationsByUser.size());
+        }
+
+        return ResponseEntity.ok().body(reservationsByUser);
     }
 }
