@@ -12,6 +12,9 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import static com.nextmeal.reservation_queue_service.utils.Constants.HEADER_APPLICATION_JSON;
+import static com.nextmeal.reservation_queue_service.utils.Constants.HEADER_CONTENT_TYPE;
+
 @Service
 public class RequestService {
 
@@ -27,7 +30,7 @@ public class RequestService {
     public void sendReservationRequest(String url, ReservationRequest request) {
         try {
             HttpHeaders headers = new HttpHeaders();
-            headers.set("Content-Type", "application/json");
+            headers.set(HEADER_CONTENT_TYPE, HEADER_APPLICATION_JSON);
             HttpEntity<ReservationRequest> entity = new HttpEntity<>(request, headers);
             restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
         } catch (Exception e) {
@@ -39,7 +42,7 @@ public class RequestService {
     public void sendReservationCancellationRequest(String url, ReservationRequest request) {
         try {
             HttpHeaders headers = new HttpHeaders();
-            headers.set("Content-Type", "application/json");
+            headers.set(HEADER_CONTENT_TYPE, HEADER_APPLICATION_JSON);
             HttpEntity<ReservationRequest> entity = new HttpEntity<>(request, headers);
             restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
         } catch (Exception e) {

@@ -7,9 +7,9 @@ public class ReservationRequest {
     private String userId;
     private String restaurantId;
     private Integer numOfPeople;
-    private Date slot;
+    private String slot;
 
-    public ReservationRequest(String userId, String restaurantId, Integer numOfPeople, Date slot) {
+    public ReservationRequest(String userId, String restaurantId, Integer numOfPeople, String slot) {
         this.userId = userId;
         this.restaurantId = restaurantId;
         this.numOfPeople = numOfPeople;
@@ -40,11 +40,11 @@ public class ReservationRequest {
         this.numOfPeople = numOfPeople;
     }
 
-    public Date getSlot() {
+    public String getSlot() {
         return slot;
     }
 
-    public void setSlot(Date slot) {
+    public void setSlot(String slot) {
         this.slot = slot;
     }
 

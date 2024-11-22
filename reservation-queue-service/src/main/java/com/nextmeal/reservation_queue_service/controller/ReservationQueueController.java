@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.nextmeal.reservation_queue_service.utils.Constants.URL_CANCEL_REQUEST;
+import static com.nextmeal.reservation_queue_service.utils.Constants.URL_CREATE_REQUEST;
+
 @RestController
 @RequestMapping("/api/v1/reservations")
 public class ReservationQueueController {
@@ -23,16 +26,14 @@ public class ReservationQueueController {
     @PostMapping("/create")
     public ResponseEntity<String> createReservation(@RequestBody ReservationRequest request) {
         logger.info("Received reservation request: {}", request);
-        String url = "http://localhost:8081/api/v1/reservations/create";
-        service.sendReservationRequest(url, request);
+        service.sendReservationRequest(URL_CREATE_REQUEST, request);
         return ResponseEntity.accepted().body("Your reservation request has been placed.");
     }
 
     @PostMapping("/cancel")
     public ResponseEntity<String> cancelReservation(@RequestBody ReservationRequest request) {
         logger.info("Received reservation cancellation request: {}", request);
-        String url = "http://localhost:8081/api/v1/reservations/cancel";
-        service.sendReservationCancellationRequest(url, request);
+        service.sendReservationCancellationRequest(URL_CANCEL_REQUEST, request);
         return ResponseEntity.accepted().body("Your cancellation request has been placed.");
     }
 }

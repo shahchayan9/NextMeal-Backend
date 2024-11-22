@@ -13,7 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
+
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,23 +45,21 @@ public class ReservationHandlerController {
         if (userOptional.isPresent() && restaurantOptional.isPresent()) {
             User user = userOptional.get();
             Restaurant restaurant = restaurantOptional.get();
-            LocalDateTime slot = LocalDateTime.ofInstant(request.getSlot().toInstant(), ZoneId.systemDefault());
+            LocalDateTime slot = LocalDateTime.parse(request.getSlot()).truncatedTo(ChronoUnit.SECONDS);
 
             if (reservationService.checkReservationAvailability(restaurant.getBusinessId(), slot, request.getNumOfPeople())) {
                 Reservation reservation = new Reservation(user.getUserId(), restaurant.getBusinessId(), slot, request.getNumOfPeople(), "CONFIRMED");
                 reservationService.saveReservation(reservation);
 
                 response = "Hello " + user.getName() + ", your reservation for " +
-                        request.getNumOfPeople() + " at " +
-                        restaurant.getName() + " on " + request.getSlot().toString() +
+                        request.getNumOfPeople() + " at " + restaurant.getName() + " on " + slot.toString() +
                         " has been successfully confirmed. Thank you!";
             } else {
                 Reservation reservation = new Reservation(user.getUserId(), restaurant.getBusinessId(), slot, request.getNumOfPeople(), "REJECTED");
                 reservationService.saveReservation(reservation);
 
                 response = "Hello " + user.getName() + ", your reservation for " +
-                        request.getNumOfPeople() + " at " +
-                        restaurant.getName() + " on " + request.getSlot().toString() +
+                        request.getNumOfPeople() + " at " + restaurant.getName() + " on " + slot.toString() +
                         " has been unfortunately rejected due to constraints. Please try a different slot!";
             }
         }
@@ -80,9 +79,9 @@ public class ReservationHandlerController {
         if (userOptional.isPresent() && restaurantOptional.isPresent()) {
             User user = userOptional.get();
             Restaurant restaurant = restaurantOptional.get();
+            LocalDateTime slot = LocalDateTime.parse(request.getSlot()).truncatedTo(ChronoUnit.SECONDS);
 
-            Optional<String> reservationIdOptional = reservationService.findReservationByDetails(user.getUserId(), restaurant.getBusinessId(),
-                    LocalDateTime.ofInstant(request.getSlot().toInstant(), ZoneId.systemDefault()), request.getNumOfPeople());
+            Optional<String> reservationIdOptional = reservationService.findReservationByDetails(user.getUserId(), restaurant.getBusinessId(), slot, request.getNumOfPeople());
 
             response = "Reservation not found";
 
@@ -92,8 +91,7 @@ public class ReservationHandlerController {
                 reservationService.deleteReservationById(reservationId);
 
                 response = "Hello " + user.getName() + ", your reservation for " +
-                        request.getNumOfPeople() + " at " +
-                        restaurant.getName() + " on " + request.getSlot().toString() +
+                        request.getNumOfPeople() + " at " + restaurant.getName() + " on " + slot.toString() +
                         " has been successfully cancelled. Thank you!";
             }
         }

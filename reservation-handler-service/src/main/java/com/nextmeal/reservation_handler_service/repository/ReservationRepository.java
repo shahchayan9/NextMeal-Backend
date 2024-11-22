@@ -17,7 +17,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, String
             "WHERE r.userId = :userId " +
             "AND r.restaurantId = :restaurantId " +
             "AND r.slot = :slot " +
-            "AND r.numberOfPeople = :numberOfPeople")
+            "AND r.numberOfPeople = :numberOfPeople " +
+            "AND r.status = 'CONFIRMED'")
     Optional<String> findReservationByDetails(
             @Param("userId") String userId,
             @Param("restaurantId") String restaurantId,

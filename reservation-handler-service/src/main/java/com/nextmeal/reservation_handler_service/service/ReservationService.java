@@ -10,12 +10,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import static com.nextmeal.reservation_handler_service.util.Constants.MAX_CAPACITY;
+
 @Service
 public class ReservationService {
 
     private final ReservationRepository repository;
 
-    private final static Integer MAX_CAPACITY = 25;
     private final static Logger logger = LoggerFactory.getLogger(ReservationService.class);
 
     public ReservationService(ReservationRepository repository) {
@@ -35,6 +36,7 @@ public class ReservationService {
     }
 
     public Optional<String> findReservationByDetails(String userId, String restaurantId, LocalDateTime slot, Integer numberOfPeople) {
+        logger.info(slot.toString());
         return repository.findReservationByDetails(userId, restaurantId, slot, numberOfPeople);
     }
 
