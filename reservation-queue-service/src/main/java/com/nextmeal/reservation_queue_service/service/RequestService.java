@@ -1,27 +1,37 @@
 package com.nextmeal.reservation_queue_service.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nextmeal.reservation_queue_service.model.ReservationRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
+import software.amazon.awssdk.services.sqs.SqsClient;
+import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
 
 import static com.nextmeal.reservation_queue_service.utils.Constants.*;
 
 @Service
 public class RequestService {
 
-    private final RabbitTemplate rabbitTemplate;
+    private final SqsClient sqsClient;
+    private final ObjectMapper objectMapper;
+
     private static final Logger logger = LoggerFactory.getLogger(RequestService.class);
 
-    public RequestService(RabbitTemplate rabbitTemplate) {
-        this.rabbitTemplate = rabbitTemplate;
+    public RequestService(SqsClient sqsClient, ObjectMapper objectMapper) {
+        this.sqsClient = sqsClient;
+        this.objectMapper = objectMapper;
     }
 
     public void sendRequest(ReservationRequest request) {
         try {
-            rabbitTemplate.convertAndSend(QUEUE_NAME, request);
-            logger.info("Published {} to the queue " + QUEUE_NAME, request.toString());
+            String messageBody = objectMapper.writeValueAsString(request);
+
+            SendMessageRequest sendMessageRequest = SendMessageRequest.builder()
+                            .queueUrl(QUEUE_URL).messageBody(messageBody)
+                            .messageGroupId(request.getRestaurantId()).build();
+            sqsClient.sendMessage(sendMessageRequest);
+            logger.info("Published {} to the SQS queue " + QUEUE_NAME, request.toString());
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
