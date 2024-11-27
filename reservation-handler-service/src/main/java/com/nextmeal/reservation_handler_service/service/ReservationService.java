@@ -2,8 +2,6 @@ package com.nextmeal.reservation_handler_service.service;
 
 import com.nextmeal.reservation_handler_service.model.ReservationRequest;
 import com.nextmeal.reservation_handler_service.model.jpa.Reservation;
-import com.nextmeal.reservation_handler_service.model.jpa.Restaurant;
-import com.nextmeal.reservation_handler_service.model.jpa.User;
 import com.nextmeal.reservation_handler_service.repository.ReservationRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,72 +18,43 @@ import static com.nextmeal.reservation_handler_service.util.Constants.MAX_CAPACI
 public class ReservationService {
 
     private final ReservationRepository repository;
-    private final UserService userService;
-    private final RestaurantService restaurantService;
 
     private final static Logger logger = LoggerFactory.getLogger(ReservationService.class);
 
-    public ReservationService(ReservationRepository repository, UserService userService, RestaurantService restaurantService) {
+    public ReservationService(ReservationRepository repository) {
         this.repository = repository;
-        this.userService = userService;
-        this.restaurantService = restaurantService;
     }
 
     public String createReservation(ReservationRequest request) {
-        Optional<User> userOptional = userService.getUserById(request.getUserId());
-        Optional<Restaurant> restaurantOptional = restaurantService.getRestaurantById(request.getRestaurantId());
+        String response;
+        LocalDateTime slot = LocalDateTime.parse(request.getSlot()).truncatedTo(ChronoUnit.SECONDS);
 
-        String response = "User/Restaurant not found";
+        if (checkReservationAvailability(request.getRestaurantId(), slot, request.getNumOfPeople())) {
+           Reservation reservation = new Reservation(request.getUserId(), request.getRestaurantId(), slot, request.getNumOfPeople(), "CONFIRMED");
+           saveReservation(reservation);
 
-        if (userOptional.isPresent() && restaurantOptional.isPresent()) {
-            User user = userOptional.get();
-            Restaurant restaurant = restaurantOptional.get();
-            LocalDateTime slot = LocalDateTime.parse(request.getSlot()).truncatedTo(ChronoUnit.SECONDS);
+           response = "Your reservation has been successfully confirmed. Thank you!";
+       } else {
+           Reservation reservation = new Reservation(request.getUserId(), request.getRestaurantId(), slot, request.getNumOfPeople(), "REJECTED");
+           saveReservation(reservation);
 
-            if (checkReservationAvailability(restaurant.getBusinessId(), slot, request.getNumOfPeople())) {
-                Reservation reservation = new Reservation(user.getUserId(), restaurant.getBusinessId(), slot, request.getNumOfPeople(), "CONFIRMED");
-                saveReservation(reservation);
-
-                response = "Hello " + user.getName() + ", your reservation for " +
-                        request.getNumOfPeople() + " at " + restaurant.getName() + " on " + slot.toString() +
-                        " has been successfully confirmed. Thank you!";
-            } else {
-                Reservation reservation = new Reservation(user.getUserId(), restaurant.getBusinessId(), slot, request.getNumOfPeople(), "REJECTED");
-                saveReservation(reservation);
-
-                response = "Hello " + user.getName() + ", your reservation for " +
-                        request.getNumOfPeople() + " at " + restaurant.getName() + " on " + slot.toString() +
-                        " has been unfortunately rejected due to constraints. Please try a different slot!";
-            }
-        }
+           response = "Your reservation has been unfortunately rejected due to constraints. Please try a different slot!";
+       }
 
         return response;
     }
 
     public String cancelReservation(ReservationRequest request) {
-        Optional<User> userOptional = userService.getUserById(request.getUserId());
-        Optional<Restaurant> restaurantOptional = restaurantService.getRestaurantById(request.getRestaurantId());
+        String response = "Reservation not found";
+        LocalDateTime slot = LocalDateTime.parse(request.getSlot()).truncatedTo(ChronoUnit.SECONDS);
 
-        String response = "User/Restaurant not found";
+        Optional<String> reservationIdOptional = findReservationByDetails(request.getUserId(), request.getRestaurantId(), slot, request.getNumOfPeople());
 
-        if (userOptional.isPresent() && restaurantOptional.isPresent()) {
-            User user = userOptional.get();
-            Restaurant restaurant = restaurantOptional.get();
-            LocalDateTime slot = LocalDateTime.parse(request.getSlot()).truncatedTo(ChronoUnit.SECONDS);
+        if (reservationIdOptional.isPresent()) {
+            String reservationId = reservationIdOptional.get();
+            deleteReservationById(reservationId);
 
-            Optional<String> reservationIdOptional = findReservationByDetails(user.getUserId(), restaurant.getBusinessId(), slot, request.getNumOfPeople());
-
-            response = "Reservation not found";
-
-            if (reservationIdOptional.isPresent()) {
-                String reservationId = reservationIdOptional.get();
-
-                deleteReservationById(reservationId);
-
-                response = "Hello " + user.getName() + ", your reservation for " +
-                        request.getNumOfPeople() + " at " + restaurant.getName() + " on " + slot.toString() +
-                        " has been successfully cancelled. Thank you!";
-            }
+            response = "Your reservation has been successfully cancelled. Thank you!";
         }
 
         return response;
@@ -93,12 +62,8 @@ public class ReservationService {
 
     public List<Reservation> getReservationsForUser(String userId) {
         List<Reservation> reservationsByUser = null;
-        Optional<User> userOptional = userService.getUserById(userId);
-
-        if (userOptional.isPresent()) {
-            reservationsByUser = findReservationsForUser(userId);
-            logger.info("Found {} reservations", reservationsByUser.size());
-        }
+        reservationsByUser = findReservationsForUser(userId);
+        logger.info("Found {} reservations", reservationsByUser.size());
 
         return reservationsByUser;
     }
