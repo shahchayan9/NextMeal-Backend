@@ -11,7 +11,7 @@ public class Config {
     @Bean
     public SqsClient sqsClient() {
         return SqsClient.builder()
-                .region(Region.US_EAST_1)
+                .region(Region.US_WEST_1)
                 .build();
     }
 }

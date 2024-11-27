@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
 
+import java.util.UUID;
+
 import static com.nextmeal.reservation_queue_service.utils.Constants.*;
 
 @Service
@@ -29,7 +31,8 @@ public class RequestService {
 
             SendMessageRequest sendMessageRequest = SendMessageRequest.builder()
                             .queueUrl(QUEUE_URL).messageBody(messageBody)
-                            .messageGroupId(request.getRestaurantId()).build();
+                            .messageGroupId(request.getRestaurantId())
+                            .messageDeduplicationId(UUID.randomUUID().toString()).build();
             sqsClient.sendMessage(sendMessageRequest);
             logger.info("Published {} to the SQS queue " + QUEUE_NAME, request.toString());
         } catch (Exception e) {
