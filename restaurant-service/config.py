@@ -1,8 +1,10 @@
 import os
+from dotenv import load_dotenv
 
 class Config:
+    load_dotenv()
     # PostgreSQL configuration
-    SQLALCHEMY_DATABASE_URI = os.getenv('DB_URL')  # Default value for local dev
+    SQLALCHEMY_DATABASE_URI = os.getenv('DB_URL')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Redis configuration (default for local dev)
