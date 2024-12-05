@@ -64,6 +64,7 @@ def get_restaurants():
                 "is_open": r[0].is_open,
                 "categories": r[0].categories,
                 "hours": r[0].hours,
+                "attributes": r[0].attributes,  # Include attributes in the response
                 "image": r[1]  # Image URL or photo_id
             }
             for r in restaurants
@@ -108,6 +109,7 @@ def get_restaurant_by_business_id(business_id):
             "is_open": restaurant[0].is_open,
             "categories": restaurant[0].categories,
             "hours": restaurant[0].hours,
+            "attributes": restaurant[0].attributes,  # Include attributes in the response
             "image": restaurant[1]  # Image URL or photo_id
         }
 
