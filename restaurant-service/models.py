@@ -19,6 +19,7 @@ class Restaurant(db.Model):
     categories = db.Column(db.ARRAY(db.String))
     menu = db.Column(db.ARRAY(db.String))
     hours = db.Column(db.JSON)
+    attributes = db.Column(db.JSON)
 
     def __repr__(self):
         return f'<Restaurant {self.name}>'

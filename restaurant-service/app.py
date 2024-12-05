@@ -2,6 +2,8 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from db import db
+import os
+from dotenv import load_dotenv
 
 def create_app():
     # Initialize the Flask app
@@ -10,8 +12,9 @@ def create_app():
     # Allow cross-origin requests
     CORS(app)
 
+    load_dotenv()
     # Database setup
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://chayanshah:admin@localhost/nextmeal'  # Replace with actual connection string
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DB_URL')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     # Initialize db with app
