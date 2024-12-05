@@ -1,5 +1,6 @@
 package com.nextmeal.reservation_handler_service.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.sqs.SqsClient;
@@ -8,13 +9,14 @@ import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest;
 
 import java.util.List;
 
-import static com.nextmeal.reservation_handler_service.util.Constants.QUEUE_URL;
-
 @Component
 public class SQSMessagePollerService {
 
     private final QueueConsumerService queueConsumerService;
     private final SqsClient sqsClient;
+
+    @Value("${aws.sqs.queue.url}")
+    private String queueUrl;
 
     public SQSMessagePollerService(QueueConsumerService queueConsumerService, SqsClient sqsClient) {
         this.queueConsumerService = queueConsumerService;
@@ -24,7 +26,7 @@ public class SQSMessagePollerService {
     @Scheduled(fixedRate = 5000)
     public void pollMessages() {
         ReceiveMessageRequest receiveMessageRequest = ReceiveMessageRequest.builder()
-                .queueUrl(QUEUE_URL)
+                .queueUrl(queueUrl)
                 .maxNumberOfMessages(10)
                 .waitTimeSeconds(5)
                 .build();

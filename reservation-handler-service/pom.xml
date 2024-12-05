@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.nextmeal</groupId>
 	<artifactId>reservation-handler-service</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>reservation-handler-service</name>
 	<description>Reservation Handler Service</description>
 	<url/>

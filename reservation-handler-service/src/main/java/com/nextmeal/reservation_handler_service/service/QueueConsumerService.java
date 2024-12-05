@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nextmeal.reservation_handler_service.model.ReservationRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.DeleteMessageRequest;
@@ -17,6 +18,9 @@ public class QueueConsumerService {
     private final ReservationService reservationService;
     private final SqsClient sqsClient;
     private final ObjectMapper objectMapper;
+
+    @Value("${aws.sqs.queue.url}")
+    private String queueUrl;
 
     private static final Logger logger = LoggerFactory.getLogger(QueueConsumerService.class);
 
@@ -40,7 +44,7 @@ public class QueueConsumerService {
             }
 
             sqsClient.deleteMessage(DeleteMessageRequest.builder()
-                    .queueUrl(QUEUE_URL).receiptHandle(message.receiptHandle()).build());
+                    .queueUrl(queueUrl).receiptHandle(message.receiptHandle()).build());
 
             logger.info(response);
         } catch (Exception e) {
