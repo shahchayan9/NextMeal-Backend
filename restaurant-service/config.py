@@ -2,7 +2,7 @@ import os
 
 class Config:
     # PostgreSQL configuration
-    SQLALCHEMY_DATABASE_URI = os.getenv('DB_URL', 'postgresql://chayanshah:admin@localhost/nextmeal')  # Default value for local dev
+    SQLALCHEMY_DATABASE_URI = os.getenv('DB_URL')  # Default value for local dev
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Redis configuration (default for local dev)
