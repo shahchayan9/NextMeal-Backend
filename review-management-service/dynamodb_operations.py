@@ -3,6 +3,8 @@ import boto3
 from botocore.exceptions import ClientError
 from decimal import Decimal
 import traceback
+from decimal import Decimal
+import uuid
 
 # Load environment variables
 from dotenv import load_dotenv
@@ -30,7 +32,15 @@ def create_review(review_data):
         # Debug: Print raw review data
         print("Received review data:", review_data)
 
-        # Convert floats to Decimal
+        # Ensure a unique review_id is generated if not provided
+        if 'review_id' not in review_data or not review_data['review_id']:
+            review_data['review_id'] = str(uuid.uuid4())  # Generate a unique UUID
+
+        # Convert specific fields to Decimal where required
+        if 'stars' in review_data:
+            review_data['stars'] = Decimal(str(review_data['stars']))  # Convert stars to Decimal
+
+        # Convert floats in other fields to Decimal, if any
         for key, value in review_data.items():
             if isinstance(value, float):
                 review_data[key] = Decimal(str(value))
@@ -40,6 +50,7 @@ def create_review(review_data):
 
         # Add the item to DynamoDB
         response = table.put_item(Item=review_data)
+        print("Review successfully added. DynamoDB response:", response)
         return response
     except ClientError as e:
         print(f"Error adding review: {e.response['Error']['Message']}")
