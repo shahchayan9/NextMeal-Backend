@@ -2,6 +2,18 @@ from flask import Blueprint, jsonify, request
 from app import db  # Ensure db is properly imported
 from models import Restaurant, RestaurantImage  # Ensure Restaurant and RestaurantImage are properly imported
 from sqlalchemy.orm import aliased  # For handling joins
+import redis
+import json
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+
+redis_client = redis.StrictRedis(
+    host=os.getenv('REDIS_HOST'),
+    port=os.getenv('REDIS_PORT'),
+    decode_responses=True
+)
 
 restaurant_routes = Blueprint('restaurant_routes', __name__)
 
@@ -28,6 +40,16 @@ def get_restaurants():
             filters["min_rating"] = min_rating
         if max_rating is not None:
             filters["max_rating"] = max_rating
+
+        cache_key = f"restaurants:{json.dumps(filters, sort_keys=True)}"
+
+        # Check if the data exists in Redis cache
+        cached_data = redis_client.get(cache_key)
+        if cached_data:
+            print("Cache Hit!")
+            return jsonify(json.loads(cached_data))
+
+        print("Cache Miss!")
 
         # Build the query to filter restaurants based on provided filters
         query = db.session.query(Restaurant, RestaurantImage.photo_id) \
@@ -69,6 +91,9 @@ def get_restaurants():
             }
             for r in restaurants
         ]
+
+         # Store the result in Redis with a TTL of 5 minutes
+        redis_client.setex(cache_key, 300, json.dumps(restaurant_list))
 
         # Return the list as a JSON response
         return jsonify(restaurant_list)
