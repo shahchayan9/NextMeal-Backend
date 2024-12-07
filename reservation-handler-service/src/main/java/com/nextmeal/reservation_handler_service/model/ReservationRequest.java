@@ -62,12 +62,12 @@ public class ReservationRequest implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ReservationRequest that = (ReservationRequest) o;
-        return Objects.equals(userId, that.userId)
-                && Objects.equals(restaurantId, that.restaurantId)
-                && Objects.equals(numOfPeople, that.numOfPeople)
-                && Objects.equals(slot, that.slot)
-                && Objects.equals(requestType, that.requestType);
+        ReservationRequest request = (ReservationRequest) o;
+        return Objects.equals(userId, request.userId)
+                && Objects.equals(restaurantId, request.restaurantId)
+                && Objects.equals(numOfPeople, request.numOfPeople)
+                && Objects.equals(slot, request.slot)
+                && Objects.equals(requestType, request.requestType);
     }
 
     @Override

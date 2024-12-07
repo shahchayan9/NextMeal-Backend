@@ -1,7 +1,9 @@
 package com.nextmeal.reservation_handler_service.service;
 
 import com.nextmeal.reservation_handler_service.model.ReservationRequest;
+import com.nextmeal.reservation_handler_service.model.ReservationResponse;
 import com.nextmeal.reservation_handler_service.model.jpa.Reservation;
+import com.nextmeal.reservation_handler_service.model.util.ReservationResponseMapper;
 import com.nextmeal.reservation_handler_service.repository.ReservationRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +13,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.nextmeal.reservation_handler_service.util.Constants.MAX_CAPACITY;
 
@@ -60,9 +63,12 @@ public class ReservationService {
         return response;
     }
 
-    public List<Reservation> getReservationsForUser(String userId) {
-        List<Reservation> reservationsByUser = null;
-        reservationsByUser = findReservationsForUser(userId);
+    public List<ReservationResponse> getReservationsForUser(String userId) {
+        List<ReservationResponse> reservationsByUser = null;
+        List<Object[]> results = findReservationsForUser(userId);
+        reservationsByUser = results.stream()
+                        .map(ReservationResponseMapper::mapToReservationResponse)
+                        .collect(Collectors.toList());
         logger.info("Found {} reservations", reservationsByUser.size());
 
         return reservationsByUser;
@@ -76,8 +82,8 @@ public class ReservationService {
         repository.deleteById(reservationId);
     }
 
-    private List<Reservation> findReservationsForUser(String userId) {
-        return repository.findByUserId(userId);
+    private List<Object[]> findReservationsForUser(String userId) {
+        return repository.findByUserIdWithRestaurantName(userId);
     }
 
     private Optional<String> findReservationByDetails(String userId, String restaurantId, LocalDateTime slot, Integer numberOfPeople) {

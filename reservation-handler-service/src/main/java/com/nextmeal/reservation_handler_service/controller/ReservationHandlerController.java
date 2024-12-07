@@ -1,6 +1,7 @@
 package com.nextmeal.reservation_handler_service.controller;
 
 import com.nextmeal.reservation_handler_service.model.ReservationRequest;
+import com.nextmeal.reservation_handler_service.model.ReservationResponse;
 import com.nextmeal.reservation_handler_service.model.jpa.Reservation;
 import com.nextmeal.reservation_handler_service.service.ReservationService;
 import org.slf4j.Logger;
@@ -12,6 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/reservations")
+@CrossOrigin(origins = "*")
 public class ReservationHandlerController {
 
     private static final Logger logger = LoggerFactory.getLogger(ReservationHandlerController.class);
@@ -38,9 +40,9 @@ public class ReservationHandlerController {
     }
 
     @GetMapping("/view/{userId}")
-    public ResponseEntity<List<Reservation>> getReservationsForUser(@PathVariable String userId) {
+    public ResponseEntity<List<ReservationResponse>> getReservationsForUser(@PathVariable String userId) {
         logger.info("Received view reservations request for: {}", userId);
-        List<Reservation> reservationsByUser = reservationService.getReservationsForUser(userId);
+        List<ReservationResponse> reservationsByUser = reservationService.getReservationsForUser(userId);
         return ResponseEntity.ok().body(reservationsByUser);
     }
 }

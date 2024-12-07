@@ -1,5 +1,6 @@
 package com.nextmeal.reservation_handler_service.repository;
 
+import com.nextmeal.reservation_handler_service.model.ReservationResponse;
 import com.nextmeal.reservation_handler_service.model.jpa.Reservation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -35,5 +36,10 @@ public interface ReservationRepository extends JpaRepository<Reservation, String
             @Param("slot") LocalDateTime slot
     );
 
-    List<Reservation> findByUserId(String userId);
+    @Query(value = "SELECT rv.reservation_id, rv.user_id, rv.business_id, rs.name, rv.slot, rv.number_of_people, rv.status " +
+            "FROM reservations rv " +
+            "LEFT JOIN restaurants rs ON rv.business_id = rs.business_id " +
+            "WHERE rv.user_id = :userId", nativeQuery = true)
+    List<Object[]> findByUserIdWithRestaurantName(@Param("userId") String userId);
+
 }
