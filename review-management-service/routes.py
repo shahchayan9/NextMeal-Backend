@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from dynamodb_operations import create_review, get_review, get_reviews_by_business, delete_review
+from dynamodb_operations import create_review, get_review, delete_review, get_reviews_with_usernames, update_review_in_dynamodb
 review_routes = Blueprint('review_routes', __name__)
 
 # Add a new review
@@ -27,13 +27,22 @@ def get_single_review(review_id):
 
 
 # Get all reviews for a business
+# @review_routes.route('/reviews/business/<string:business_id>', methods=['GET'])
+# def get_reviews_for_business(business_id):
+#     reviews = get_reviews_by_business(business_id)
+#     if reviews:
+#         return jsonify(reviews)
+#     else:
+#         return jsonify({"error": "No reviews found for this business"}), 404
+    
 @review_routes.route('/reviews/business/<string:business_id>', methods=['GET'])
-def get_reviews_for_business(business_id):
-    reviews = get_reviews_by_business(business_id)
+def get_reviews_for_business_with_usernames(business_id):
+    reviews = get_reviews_with_usernames(business_id)
     if reviews:
         return jsonify(reviews)
     else:
         return jsonify({"error": "No reviews found for this business"}), 404
+
 
 
 # Delete a review
@@ -44,3 +53,13 @@ def delete_single_review(review_id):
         return jsonify({"message": "Review deleted successfully"})
     else:
         return jsonify({"error": "Failed to delete review"}), 500
+
+# Update a review
+@review_routes.route('/reviews/<string:review_id>', methods=['PUT'])
+def update_review(review_id):
+    updated_data = request.json  # Get the updated data from the request body
+    response = update_review_in_dynamodb(review_id, updated_data)
+    if response:
+        return jsonify({"message": "Review updated successfully"}), 200
+    else:
+        return jsonify({"error": "Failed to update review"}), 500
