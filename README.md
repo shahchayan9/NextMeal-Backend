@@ -111,7 +111,7 @@ To set up and deploy all services, follow these steps:
    cd <repository-folder>
    ```
 
-# Preparing Microservices
+2. **Preparing Microservices**:
 
 ## Navigate to Each Microservice Directory
 `cd <microservice-name>`
