@@ -1,6 +1,6 @@
 # NextMeal Backend Repository
 
-This repository contains the backend services for the **NextMeal** application, implemented as microservices. Each microservice has a distinct responsibility and is designed for scalability and maintainability.
+At **NextMeal**, we aim to create an intelligent dining experience platform that personalizes restaurant recommendations based on user preferences, authenticates users securely via Keycloak with SSO and 2FA, and integrates microservices for reservations, reviews, and AI-driven guidance. By combining technologies like PostgreSQL for user data storage and OpenAI’s RAG-based chatbot for dynamic recommendations, NextMeal streamlines the entire discovery, booking, and feedback cycle for an enhanced culinary journey.
 
 ## Table of Contents
 
