@@ -94,7 +94,7 @@ Follow these steps to set up and run the services locally:
 
 - Python 3.9 or higher
 - Node.js
-- Spring Boot (Java 11+)
+- Spring Boot (Java 17)
 - Redis
 - PostgreSQL
 - DynamoDB (AWS CLI configured)
