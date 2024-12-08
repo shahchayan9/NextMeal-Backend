@@ -7,13 +7,14 @@ This repository contains the backend services for the **NextMeal** application, 
 - [Overview](#overview)
 - [Microservices](#microservices)
   - [AI Assistant Service](#ai-assistant-service)
-  - [Auth Service](#auth-service)
+  - [User Auth Service](#user-auth-service)
   - [Reservation Handler Service](#reservation-handler-service)
   - [Reservation Queue Service](#reservation-queue-service)
   - [Restaurant Service](#restaurant-service)
   - [Review Management Service](#review-management-service)
 - [Technologies Used](#technologies-used)
 - [Setup Instructions](#setup-instructions)
+- [Deployment](#deployment)
 - [Contributing](#contributing)
 
 ---
@@ -22,7 +23,7 @@ This repository contains the backend services for the **NextMeal** application, 
 
 This backend system is designed as a collection of six microservices that handle various aspects of the **NextMeal** platform. These services include user authentication, restaurant information, reservation handling, review management, queue processing, and AI-powered assistance.
 
-Each service is independent and communicates with others using RESTful APIs, with plans to implement asynchronous messaging where needed.
+All microservices are deployed in **AWS ECS (Elastic Container Service)**, and databases (PostgreSQL, DynamoDB) and other AWS resources like S3, SQS, Elasticache, and OpenSearch are fully integrated for production.
 
 ---
 
@@ -64,7 +65,7 @@ Each service is independent and communicates with others using RESTful APIs, wit
 
 ### 6. **Review Management Service**
 - **Backend Framework**: Python Flask
-- **Database**: DynamoDB
+- **Database**: DynamoDB (created in AWS)
 - **Description**: Handles user reviews for restaurants, including creating, reading, updating, and deleting reviews.
 - **Recent Changes**: Fixed minor issues and improved stability.
 
@@ -73,11 +74,13 @@ Each service is independent and communicates with others using RESTful APIs, wit
 ## Technologies Used
 
 - **Backend Frameworks**: Python Flask, Spring Boot, Node.js
-- **Databases**: PostgreSQL, DynamoDB, OpenSearch (AWS)
+- **Databases**: PostgreSQL (via AWS RDS), DynamoDB, OpenSearch (AWS)
 - **Caching**: Redis (via AWS Elasticache)
 - **Message Queues**: Amazon SQS
 - **Storage**: Amazon S3
 - **External APIs**: OpenAI API for AI-related functionalities
+- **Containerization**: Docker
+- **Orchestration**: AWS ECS
 - **Frontend Integration**: Services are integrated with a ReactJS frontend.
 
 ---
@@ -90,8 +93,9 @@ Follow these steps to set up and run the services locally:
 
 - Python 3.9 or higher
 - Node.js
+- Spring Boot (Java 11+)
 - Redis
 - PostgreSQL
-- DynamoDB
+- DynamoDB (AWS CLI configured)
 - OpenSearch (or a compatible vector database)
-- Docker (optional, for containerization)
+- Docker (for local testing)
