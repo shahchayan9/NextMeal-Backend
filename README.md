@@ -1,6 +1,6 @@
 # NextMeal Backend Repository
 
-At **NextMeal**, we aim to create an intelligent dining experience platform that personalizes restaurant recommendations based on user preferences, authenticates users securely via Keycloak with SSO and 2FA, and integrates microservices for reservations, reviews, and AI-driven guidance. By combining technologies like PostgreSQL for user data storage and OpenAI’s RAG-based chatbot for dynamic recommendations, NextMeal streamlines the entire discovery, booking, and feedback cycle for an enhanced culinary journey.
+At **NextMeal**, we are building an intelligent dining platform that seamlessly integrates a full suite of technologies: secure user authentication via **Keycloak** (SSO and 2FA), microservices built with **Python Flask**, **Node.js**, and **Spring Boot (Java)**, persistent data storage using **PostgreSQL** (RDS), **DynamoDB**, and **OpenSearch** for vector embeddings, **Redis (Elasticache)** for caching, **SQS** for messaging, **S3** for media storage, and **OpenAI** for AI-driven recommendations. All components are containerized with **Docker**, stored in **AWS ECR**, and orchestrated on **AWS ECS**, providing a scalable and maintainable ecosystem that dynamically adapts to user preferences and enhances their dining experience.
 
 ## Table of Contents
 
@@ -78,6 +78,7 @@ All microservices are containerized using **Docker**, their images are pushed to
 - Queue: Amazon SQS
 - Storage: Amazon S3
 - External APIs: OpenAI
+- Authentication: Keycloak (SSO, 2FA)
 - Containerization: Docker
 - Registry: AWS ECR
 - Orchestration: AWS ECS
