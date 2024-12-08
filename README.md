@@ -23,7 +23,7 @@ This repository contains the backend services for the **NextMeal** application, 
 
 This backend system is designed as a collection of six microservices that handle various aspects of the **NextMeal** platform. These services include user authentication, restaurant information, reservation handling, review management, queue processing, and AI-powered assistance.
 
-All microservices are deployed in **AWS ECS (Elastic Container Service)**, and databases (PostgreSQL, DynamoDB) and other AWS resources like S3, SQS, Elasticache, and OpenSearch are fully integrated for production.
+All microservices are containerized using **Docker**, their images are pushed to **AWS ECR (Elastic Container Registry)**, and they are deployed on **AWS ECS (Elastic Container Service)**. Databases and other AWS services such as S3, SQS, Elasticache, and OpenSearch are fully integrated.
 
 ---
 
@@ -80,6 +80,7 @@ All microservices are deployed in **AWS ECS (Elastic Container Service)**, and d
 - **Storage**: Amazon S3
 - **External APIs**: OpenAI API for AI-related functionalities
 - **Containerization**: Docker
+- **Container Registry**: AWS ECR
 - **Orchestration**: AWS ECS
 - **Frontend Integration**: Services are integrated with a ReactJS frontend.
 
