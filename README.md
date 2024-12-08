@@ -111,7 +111,6 @@ To set up and deploy all services, follow these steps:
    cd <repository-folder>
    ```
 
-
 # Preparing Microservices
 
 ## Navigate to Each Microservice Directory
@@ -120,7 +119,7 @@ To set up and deploy all services, follow these steps:
 ## Install Dependencies
 
 ### Python (Flask)
-`pip install -r requirements.txt`
+`pip3 install -r requirements.txt`
 
 ### Node.js
 `npm install`
@@ -138,12 +137,12 @@ Create a `.env` file in each microservice folder with required configurations su
 ## Run Microservices Locally
 
 ### Python (Flask)
-`python app.py`
+`python3 app.py`
 
 ### Node.js
 `npm start`
 
-### Spring Boot (Java 21)
+### Spring Boot (Java 17)
 `mvn spring-boot:run`
 
 ## Containerize and Push to AWS ECR
