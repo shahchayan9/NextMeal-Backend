@@ -113,7 +113,7 @@ To set up and deploy all services, follow these steps:
 
 2. **Preparing Microservices**:
 
-## Navigate to Each Microservice Directory
+### Navigate to Each Microservice Directory
 `cd <microservice-name>`
 
 ## Install Dependencies
