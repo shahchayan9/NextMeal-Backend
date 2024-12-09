@@ -5,3 +5,4 @@ psycopg2==2.9.10
 redis==5.2.0
 python-dotenv
 psycopg2-binary==2.9.10
+prometheus_client==0.16.0

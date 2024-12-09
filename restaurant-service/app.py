@@ -1,38 +1,49 @@
-from flask import Flask
+from flask import Flask, g, request, Response
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from db import db
 import os
 from dotenv import load_dotenv
+from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
+from metrics import REQUEST_COUNT, REQUEST_LATENCY  # Import metrics here
+
+load_dotenv()
+
+def before_request():
+    # Using time.time() for simplicity
+    import time
+    g.start_time = time.time()
+
+def after_request(response):
+    import time
+    latency = time.time() - g.start_time
+    REQUEST_LATENCY.labels(request.path).observe(latency)
+    REQUEST_COUNT.labels(request.method, request.path).inc()
+    return response
 
 def create_app():
-    # Initialize the Flask app
     app = Flask(__name__)
-
-    # Allow cross-origin requests
     CORS(app)
-
-    load_dotenv()
-    # Database setup
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DB_URL')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-    # Initialize db with app
     db.init_app(app)
 
-    # Import routes after initializing app and db
     from routes import restaurant_routes
-
-    # Register the blueprint for routes
     app.register_blueprint(restaurant_routes)
 
-    # Add a root route to return a simple message or redirect
+    app.before_request(before_request)
+    app.after_request(after_request)
+
+    @app.route('/metrics')
+    def metrics():
+        return Response(generate_latest(), mimetype=CONTENT_TYPE_LATEST)
+
     @app.route('/')
     def index():
-        return 'Welcome to the Restaurant API! Go to /restaurants to view the restaurants.'
+        return 'Welcome to the Restaurant API!'
 
     return app
 
 if __name__ == '__main__':
     app = create_app()
-    app.run(debug=True, host='0.0.0.0', port=5004)  # 0.0.0.0 allows external access
+    app.run(debug=True, host='0.0.0.0', port=5004)
