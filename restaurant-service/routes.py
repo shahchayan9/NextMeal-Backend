@@ -11,7 +11,9 @@ load_dotenv()
 
 redis_client = redis.StrictRedis(
     host=os.getenv('REDIS_HOST'),
-    port=os.getenv('REDIS_PORT'),
+    port=int(os.getenv('REDIS_PORT', 6379)),
+    ssl=True,
+    ssl_cert_reqs=None,
     decode_responses=True
 )
 
