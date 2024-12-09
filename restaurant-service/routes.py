@@ -5,9 +5,14 @@ from sqlalchemy.orm import aliased  # For handling joins
 import redis
 import json
 import os
+from prometheus_client import Counter
 from dotenv import load_dotenv
 load_dotenv()
 
+RESTAURANTS_API_HITS = Counter(
+    'restaurants_api_hits_total',
+    'Total number of hits to the /restaurants API'
+)
 
 redis_client = redis.StrictRedis(
     host=os.getenv('REDIS_HOST'),
@@ -23,6 +28,10 @@ restaurant_routes = Blueprint('restaurant_routes', __name__)
 @restaurant_routes.route('/restaurants', methods=['GET'])
 def get_restaurants():
     try:
+
+        # Increment the counter whenever this endpoint is hit
+        RESTAURANTS_API_HITS.inc()
+
         # Get filter parameters from the request (if they exist)
         filters = {}
         name = request.args.get('name')

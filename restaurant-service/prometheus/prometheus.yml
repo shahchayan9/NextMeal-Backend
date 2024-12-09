@@ -6,4 +6,4 @@ scrape_configs:
     metrics_path: '/metrics'
     scheme: 'http'
     static_configs:
-      - targets: ['13.57.59.183:5004']
+      - targets: ['54.219.204.5:5004']
